@@ -13,7 +13,7 @@
     "ask-sdk-core": "^2.4.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "pulselabslibrary": "1.0.14",
+    "pulselabs-sdk": "^1.0.1",
     "request": "^2.88.0"
   }
 }

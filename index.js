@@ -2,11 +2,11 @@ const express = require('express');
 const request = require("request");
 const bodyParser = require("body-parser");
 const http = require("http");
-const pulse = require('pulselabslibrary').NodeService.init("apiKey",[]);
+const pulselabsSdk = require('pulselabs-sdk').default.init("apiKeyHere");
 
 let app = express();
 let port = process.env.PORT || 3000;
-
+pulselabsSdk.setInterceptUrls(["/"]);
 app.use(bodyParser.json({extended : true}));
 
 app.post('/', (req, res) => {
