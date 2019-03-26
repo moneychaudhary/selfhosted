@@ -26,7 +26,8 @@ async function handleRequest(event, response) {
     } else if(request.type === "IntentRequest") {
       let options = {};
       if(request.intent.name === "ShortAudioIntent") {
-        options.speechText = `Hello ${name}. Hope you are doing well today.`;
+        options.speechText ="<audio src='https://s3-us-west-2.amazonaws.com/jessie.stieger/pulselabsprofessor/Intro.1.mp3' />";
+        options.speechText+= "Now say play long form audio to play using audio player";
         options.shouldEndSession = false;
       } else {
         options.speechText = "Sorry I don't know how to respond to that";
@@ -43,12 +44,14 @@ async function handleRequest(event, response) {
     } else {
       let options = {
         speechText: "Got unknown request type",
+        shouldEndSession: true
       };
       response.send(buildResponse(options));
     }
   } catch (e) {
     let options = {
       speechText: "Some Error occurred",
+      shouldEndSession: true
     };
     response.send(buildResponse(options));
   }
@@ -60,8 +63,8 @@ function buildResponse(options) {
     sessionAttributes: {},
     response: {
       outputSpeech: {
-        type: "PlainText",
-        text: options.speechText
+        type: "SSML",
+        ssml: "<speak>" + options.speechText + "</speak>"
       },
       shouldEndSession: options.shouldEndSession
     }
@@ -70,8 +73,8 @@ function buildResponse(options) {
   if(options.repromptText) {
     response.response.reprompt = {
       outputSpeech: {
-        type: "PlainText",
-        text: options.repromptText
+        type: "SSML",
+        ssml: "<speak>" + options.repromptText + "</speak>"
       }
     }
   }
