@@ -1,12 +1,9 @@
 const express = require('express');
-const request = require("request");
 const bodyParser = require("body-parser");
-const http = require("http");
-const pulselabsSdk = require('pulselabs-sdk').default.init("apiKeyHere");
+const pulse = require('pulselabs-sdk').init("apiKeyHere");
 
 let app = express();
 let port = process.env.PORT || 3000;
-pulselabsSdk.setInterceptUrls(["/"]);
 app.use(bodyParser.json({extended : true}));
 
 app.post('/', (req, res) => {
@@ -15,25 +12,28 @@ app.post('/', (req, res) => {
 
 async function handleRequest(event, response) {
   try {
+    let res;
     let request = event.request;
     if(request.type === "LaunchRequest") {
       let options = {
-        speechText: "Welcome to Greeting skill. Using our skill you can greet the guests. Whom do you want to greet?",
-        repromptText: "You can say for example say hello to john",
+        speechText: "Welcome to Self hosted skill. Say play short audio to listen to a audio clip",
+        repromptText: "You can say play short audio",
         shouldEndSession: false
       };
-      response.send(buildResponse(options));
+      res = buildResponse(options);
+      pulse.log(request, res);
+      response.send(res);
     } else if(request.type === "IntentRequest") {
       let options = {};
-      if(request.intent.name === "HelloIntent") {
-        let name = request.intent.slots.FirstName.value;
+      if(request.intent.name === "ShortAudioIntent") {
         options.speechText = `Hello ${name}. Hope you are doing well today.`;
-        options.speechText += await getQuote();
-        options.shouldEndSession = true;
+        options.shouldEndSession = false;
       } else {
-        options.speechText = "Sorry I donot know how to respond to that";
+        options.speechText = "Sorry I don't know how to respond to that";
       }
-      response.send(buildResponse(options));
+      res = buildResponse(options);
+      pulse.log(request, res);
+      response.send(res);
     } else if(request.type === "SessionEndedRequest") {
       let options = {
         speechText: "Bye for now",
@@ -54,24 +54,6 @@ async function handleRequest(event, response) {
   }
 }
 
-function getQuote() {
-  return new Promise((resolve) => {
-    request({
-      url: 'http://api.forismatic.com/api/1.0/json?method=getQuote&lang=en&format=json',
-      json: true
-    }, (error, response, body) => {
-      if (error) {
-        resolve("");
-      } else if (response && response.statusCode === 200) {
-        let quote = body.quoteText;
-        resolve(quote);
-      } else {
-        resolve("");
-      }
-    });
-  });
-}
-
 function buildResponse(options) {
   let response = {
     version: "1.0",
@@ -80,11 +62,6 @@ function buildResponse(options) {
       outputSpeech: {
         type: "PlainText",
         text: options.speechText
-      },
-      card: {
-        type: "Simple",
-        title: "Greetings",
-        content: "Welcome to Greetings skill."
       },
       shouldEndSession: options.shouldEndSession
     }
@@ -102,6 +79,4 @@ function buildResponse(options) {
   return response;
 }
 
-app.listen(port, () => {
-  console.log("app started");
-});
+app.listen(port);
