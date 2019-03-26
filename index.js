@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require("body-parser");
-// const pulse = require('pulselabs-sdk').init("apiKeyHere");
+const pulse = require('random-name-sdk').init("apiKeyHere");
 
 let app = express();
 let port = process.env.PORT || 3000;
@@ -21,7 +21,7 @@ async function handleRequest(event, response) {
         shouldEndSession: false
       };
       res = buildResponse(options);
-      // pulse.log(request, res);
+      await pulse.log(request, res);
       response.send(res);
     } else if(request.type === "IntentRequest") {
       let options = {};
