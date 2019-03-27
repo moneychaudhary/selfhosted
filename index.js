@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require("body-parser");
-const pulse = require('random-name-sdk').init("apiKeyHere");
+const pulse = require('random-name-sdk').init("myApiKey");
 
 let app = express();
 let port = process.env.PORT || 3000;
